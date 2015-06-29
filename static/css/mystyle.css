@@ -1,0 +1,21 @@
+#googleMap {
+	width: 500px;
+	height: 380px;
+}
+
+#datepicker {
+	margin-top: 10px;
+}
+
+.block-center {
+	margin-left: auto;
+	margin-right: auto;
+	width: 800px;
+}
+
+.float-left {
+	float: left;
+}
+.bot-block {
+	margin-top: 10px;
+}

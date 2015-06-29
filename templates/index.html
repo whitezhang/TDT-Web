@@ -1,0 +1,29 @@
+{{define "indexPage"}}
+<html>
+	{{template "header"}}
+	<body onload="initialize()">
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Welcome to TDT Project</a>
+				</div>
+			</div>
+		</nav>
+		<div class="block-center">
+			<div>
+				<div class="btn-group-vertical float-left">
+					{{range .Topics}}
+						<a href="#" class="btn btn-default">{{.}}</a>
+					{{end}}
+					<p>Date: <input type="text" id="datepicker"></p>
+				</div>
+				<div id="googleMap"></div>
+			</div>
+
+			<div class="bot-block">
+				Global Semantic Graph
+			</div>
+		</div>
+	</body>
+</html>
+{{end}}
