@@ -1,5 +1,5 @@
 #googleMap {
-	width: 500px;
+	width: 650px;
 	height: 380px;
 }
 
@@ -10,11 +10,12 @@
 .block-center {
 	margin-left: auto;
 	margin-right: auto;
-	width: 800px;
+	width: 1050px;
 }
 
 .float-left {
 	float: left;
+	margin-right: 10px;
 }
 .bot-block {
 	margin-top: 10px;
