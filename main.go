@@ -23,8 +23,13 @@ type TopicModels struct {
  * @param: filename string = top_words_path + "txt"
  */
 func loadTopicModels(filepath string) (*TopicModels, error) {
+	// number of topics that shown in the home page
+	const num_topics = 10
+	// number of keywords for each topic
+	const num_keywords = 5
+
 	filename := filepath + ".txt"
-	fmt.Println(filename)
+	fmt.Println("Load topic models from ", filename)
 
 	// Read files
 	fin, err := os.Open(filename)
@@ -34,9 +39,9 @@ func loadTopicModels(filepath string) (*TopicModels, error) {
 		return nil, err
 	}
 	reader := bufio.NewReader(fin)
-	var topics [20]string
+	var topics [num_topics]string
 	index := -1
-	num_topics := 0
+	count_topics := 0
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil || io.EOF == err {
@@ -47,13 +52,13 @@ func loadTopicModels(filepath string) (*TopicModels, error) {
 			continue
 		} else if strings.Contains(line, "Topic #") {
 			index++
-			num_topics = 0
-		} else if num_topics > 5 {
+			count_topics = 0
+		} else if count_topics >= num_keywords {
 			continue
 		} else {
 			info := strings.Split(line, " ")
 			topics[index] += info[0] + " "
-			num_topics++
+			count_topics++
 		}
 	}
 
