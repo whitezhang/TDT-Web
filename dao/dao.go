@@ -8,6 +8,8 @@ import (
 	"regexp"
 )
 
+const HostIP = "127.0.0.1"
+
 type Twitter struct {
 	Text string `bson: "text"`
 }
@@ -30,8 +32,12 @@ type NewsData struct {
 	MainStory   string `bson:"mainStory" json:"mainStory"`
 }
 
+type TimeStamp struct {
+	TimeStamp string `bson:"timeStamp" json:"timeStamp"`
+}
+
 func GetSimpleNewsDataOnID(sid string) (*SimpleNewsData, error) {
-	session, err := mgo.Dial("127.0.0.1")
+	session, err := mgo.Dial(HostIP)
 	if err != nil {
 		fmt.Println("Connect MongoDB failed")
 		return nil, err
@@ -53,11 +59,32 @@ func GetSimpleNewsDataOnID(sid string) (*SimpleNewsData, error) {
 	return &result, nil
 }
 
+func GetTimeStampOnID(sid string) (*TimeStamp, error) {
+	session, err := mgo.Dial(HostIP)
+	if err != nil {
+		fmt.Println("Connect MongoDB failed")
+		return nil, err
+	}
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	conn := session.DB("gms").C("newsdata")
+	// Find
+	var result TimeStamp
+	err = conn.FindId(bson.ObjectIdHex(sid)).Select(bson.M{"timeStamp": 1}).One(&result)
+	if err != nil {
+		fmt.Println("Get timestamp failed")
+		log.Fatal(err)
+		return nil, err
+	}
+	return &result, nil
+}
+
 /*
  * Usage: get the whole newsdata
  */
 func GetNewsDataOnID(sid string) (*NewsData, error) {
-	session, err := mgo.Dial("127.0.0.1")
+	session, err := mgo.Dial(HostIP)
 	if err != nil {
 		fmt.Println("Connect MongoDB failed")
 		return nil, err

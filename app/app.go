@@ -50,7 +50,7 @@ func Index2Id(index int) (string, error) {
 	return "", err
 }
 
-func EntityCounter(targetEntity string) []string {
+func GetIdsHasEntity(targetEntity string) []string {
 	var ids []string
 	for sid, eNode := range entitySet.entityNode {
 		for _, entityName := range eNode.entity {

@@ -239,8 +239,15 @@ func documentHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	sid := r.Form["id"][0]
 	newsDoc, err := dao.GetNewsDataOnID(sid)
-	idsHasEntity := app.EntityCounter("Pupil")
-	fmt.Println(idsHasEntity)
+	// Demo
+	// Get IDs that has this entity
+	idsHasEntity := app.GetIdsHasEntity("Pupil")
+	var timeStampSet map[string]int
+	// For each id, find the timestamp
+	for _, id := range idsHasEntity {
+		timeStamp, _ := dao.GetTimeStampOnID(id)
+		fmt.Println(idsHasEntity, timeStamp.TimeStamp)
+	}
 	// Views loading
 	templates := template.Must(template.ParseGlob("./templates/*"))
 	err = templates.ExecuteTemplate(w, "documentPage", newsDoc)
