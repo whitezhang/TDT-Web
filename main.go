@@ -1,8 +1,8 @@
 package main
 
 import (
+	"./dao"
 	"bufio"
-	// "dao"
 	"fmt"
 	"html/template"
 	"io"
@@ -72,6 +72,7 @@ func index2Id(index int) (string, error) {
 		if err != nil || io.EOF == err {
 			break
 		}
+		line = strings.Replace(line, "\n", "", -1)
 		if i == index {
 			info := strings.Split(line, "/")
 			return info[len(info)-1], nil
@@ -103,6 +104,7 @@ func loadTopicModels() (*TopicModels, error) {
 		if err != nil || io.EOF == err {
 			break
 		}
+		line = strings.Replace(line, "\n", "", -1)
 
 		if strings.Contains(line, "----") {
 			continue
@@ -149,36 +151,37 @@ func generateTopicPostingList(index int) ([]int, error) {
 	probsList := NewSlice(topicPostingList.DocumentsProb[index])
 	sort.Sort(probsList)
 	// s.idx is the indices of the slice
-	fmt.Println(probsList.idx)
+	// fmt.Println(probsList.idx)
 	return probsList.idx, nil
 }
 
-func loadDocumentsOnTopics(index int) {
-	fin, err := os.Open(pzd_file)
-	defer fin.Close()
-	if err != nil {
-		panic(err)
-		return
-	}
-	reader := bufio.NewReader(fin)
-	// var docProbs []float64
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil || io.EOF == err {
-			break
-		}
-		line = strings.Replace(line, "\n", "", -1)
-		info := strings.Split(line, ": ")
-		probsString := info[1]
-		// sortedProbIndex
-		fmt.Println("...", probsString, "..")
-		for _, probString := range strings.Split(probsString, " ") {
-			prob, _ := strconv.ParseFloat(probString, 64)
-			fmt.Println(prob)
-		}
-	}
-	return
-}
+// Discarded
+// func loadDocumentsOnTopics(index int) {
+// 	fin, err := os.Open(pzd_file)
+// 	defer fin.Close()
+// 	if err != nil {
+// 		panic(err)
+// 		return
+// 	}
+// 	reader := bufio.NewReader(fin)
+// 	// var docProbs []float64
+// 	for {
+// 		line, err := reader.ReadString('\n')
+// 		if err != nil || io.EOF == err {
+// 			break
+// 		}
+// 		line = strings.Replace(line, "\n", "", -1)
+// 		info := strings.Split(line, ": ")
+// 		probsString := info[1]
+// 		// sortedProbIndex
+// 		fmt.Println("...", probsString, "..")
+// 		for _, probString := range strings.Split(probsString, " ") {
+// 			prob, _ := strconv.ParseFloat(probString, 64)
+// 			fmt.Println(prob)
+// 		}
+// 	}
+// 	return
+// }
 
 /*
  * Usage: find the position of the topic
@@ -217,24 +220,37 @@ func topicHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	keywords := r.Form["keywords"][0]
 	position := findTopicPosition(keywords)
-	// loadDocumentsOnTopics(position)
+
 	documentsPostingIndices, err := generateTopicPostingList(position)
 	if err != nil {
 		panic(err)
 		return
 	}
-
+	// Map indices to ids
 	documetnsPostingIds := make([]string, num_documents)
 	for index, value := range documentsPostingIndices[:num_documents] {
 		documetnsPostingIds[index], err = index2Id(value)
 	}
 
-	// passed parameter
+	// News
+	docsInPage := make([]dao.NewsData, num_documents)
+	for index, value := range documetnsPostingIds {
+		newsData, err := dao.GetNewsDataOnID(value)
+		if err != nil {
+			panic(err)
+			return
+		}
+		docsInPage[index] = *newsData
+	}
+
+	// fmt.Println(docsInPage)
+	// Passed parameter
 	pageDict := make(map[string]string)
 	pageDict["keywords"] = keywords
 	// Views loading
 	templates := template.Must(template.ParseGlob("./templates/*"))
-	err = templates.ExecuteTemplate(w, "topicPage", documetnsPostingIds[:num_documents])
+	err = templates.ExecuteTemplate(w, "topicPage", docsInPage)
+	// err = templates.ExecuteTemplate(w, "topicPage", documetnsPostingIds[:num_documents])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -246,4 +262,5 @@ func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/topic", topicHandler)
 	http.ListenAndServe(":8090", nil)
+
 }

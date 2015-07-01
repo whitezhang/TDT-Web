@@ -3,7 +3,14 @@
 <html>
 	{{template "header"}}
 	<body>
-		{{.}}
+		{{range .}}
+			{{.Title}}
+			{{.TimeStamp}}
+			{{.Description}}
+			<!-- {{.MainStory}} -->
+			<br/>
+			<br/>
+		{{end}}
 	</body>
 </html>
 {{end}}
