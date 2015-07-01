@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -14,14 +15,14 @@ const indices2id_file = "../plsa/file-path.txt"
 const entity_path = "/Users/wyatt/Documents/Code/Gla/Final/Sources/web/db/gms/r_month-4/"
 
 type EntityNode struct {
-	entity []string
+	ExpEntity []string
 }
 
 type EntitySet struct {
-	entityNode map[string]EntityNode
+	ExpEntityNode map[string]EntityNode
 }
 
-var entitySet EntitySet
+var ExpEntitySet EntitySet
 
 /*
  * Usage: find the id according to the index
@@ -50,10 +51,18 @@ func Index2Id(index int) (string, error) {
 	return "", err
 }
 
-func GetIdsHasEntity(targetEntity string) []string {
+func SplitDate(date string) (int, int, int) {
+	info := strings.Split(date, "/")
+	day, _ := strconv.Atoi(info[0])
+	month, _ := strconv.Atoi(info[1])
+	year, _ := strconv.Atoi(info[2])
+	return day, month, year
+}
+
+func GetIdsFromEntity(targetEntity string) []string {
 	var ids []string
-	for sid, eNode := range entitySet.entityNode {
-		for _, entityName := range eNode.entity {
+	for sid, eNode := range ExpEntitySet.ExpEntityNode {
+		for _, entityName := range eNode.ExpEntity {
 			if entityName == targetEntity {
 				ids = append(ids, sid)
 				break
@@ -64,6 +73,7 @@ func GetIdsHasEntity(targetEntity string) []string {
 }
 
 func GenerateEntitySet() error {
+	ExpEntitySet.ExpEntityNode = make(map[string]EntityNode)
 	err := filepath.Walk(entity_path, func(path string, info os.FileInfo, err error) error {
 		if info == nil {
 			fmt.Println("Error:", err)
@@ -99,12 +109,12 @@ func GenerateEntitySet() error {
 					entityNames = append(entityNames, v[1])
 				}
 			}
-			entitySet.entityNode = make(map[string]EntityNode)
-			entitySet.entityNode[sid] = EntityNode{entity: entityNames}
-			fmt.Printf("%s Entity Set: %s\n", sid, entitySet.entityNode[sid])
+			ExpEntitySet.ExpEntityNode[sid] = EntityNode{ExpEntity: entityNames}
+			// fmt.Printf("%s Entity Set: %s\n", sid, ExpEntitySet.ExpEntityNode)
 		}
 		return nil
 	})
+	fmt.Println("Have generated the entity set")
 	if err != nil {
 		panic(err)
 		return err

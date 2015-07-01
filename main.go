@@ -28,12 +28,35 @@ const num_documents = 10
 
 // var templates = template.Must(template.ParseGlob("./templates/*"))
 
+/*
+ * Strcut that in page returned
+ */
+type RetDocPage struct {
+	EntitiesTrends EntitiesTrends
+	NewsDoc        dao.NewsData
+}
+
+/*
+ * Common struct
+ */
 type TopicModels struct {
 	Topics []string
 }
 
 type TopicPostingList struct {
 	DocumentsProb [num_topics][]float64
+}
+
+/*
+ * Usage: Trends struct
+ */
+
+type EntityTrendOnTime struct {
+	EntityCount []int
+}
+
+type EntitiesTrends struct {
+	EntityTrendOnTime map[string]EntityTrendOnTime
 }
 
 // Usage: get the indices of the sorted slice
@@ -236,21 +259,43 @@ func topicHandler(w http.ResponseWriter, r *http.Request) {
  * Usage: document page handler(/document?id=xxx)
  */
 func documentHandler(w http.ResponseWriter, r *http.Request) {
+	var retDocPage RetDocPage
+
 	r.ParseForm()
 	sid := r.Form["id"][0]
 	newsDoc, err := dao.GetNewsDataOnID(sid)
+	retDocPage.NewsDoc = *newsDoc
 	// Demo
 	// Get IDs that has this entity
-	idsHasEntity := app.GetIdsHasEntity("Pupil")
-	var timeStampSet map[string]int
-	// For each id, find the timestamp
-	for _, id := range idsHasEntity {
-		timeStamp, _ := dao.GetTimeStampOnID(id)
-		fmt.Println(idsHasEntity, timeStamp.TimeStamp)
+	// fmt.Println(sid, "----", app.ExpEntitySet.ExpEntityNode[sid])
+	var entitiesTrends EntitiesTrends
+	entitiesTrends.EntityTrendOnTime = make(map[string]EntityTrendOnTime)
+
+	for _, name := range app.ExpEntitySet.ExpEntityNode[sid].ExpEntity {
+		entitiesTrends.EntityTrendOnTime[name] = EntityTrendOnTime{EntityCount: make([]int, 31)}
+		fmt.Println(name)
+		idsHasEntity := app.GetIdsFromEntity(name)
+		for _, id := range idsHasEntity {
+			timeStamp, _ := dao.GetTimeStampOnID(id)
+			fmt.Println(id, timeStamp.TimeStamp)
+			day, _, _ := app.SplitDate(timeStamp.TimeStamp)
+			entitiesTrends.EntityTrendOnTime[name].EntityCount[day]++
+		}
 	}
+	fmt.Println(entitiesTrends)
+	retDocPage.EntitiesTrends = entitiesTrends
+	// Test
+	// idsHasEntity := app.GetIdsFromEntity("Pupil")
+	// var timeStampSet map[string]int
+	// For each id, find the timestamp
+	// for _, id := range idsHasEntity {
+	// 	timeStamp, _ := dao.GetTimeStampOnID(id)
+	// 	fmt.Println(idsHasEntity, timeStamp.TimeStamp)
+	// }
 	// Views loading
 	templates := template.Must(template.ParseGlob("./templates/*"))
-	err = templates.ExecuteTemplate(w, "documentPage", newsDoc)
+	err = templates.ExecuteTemplate(w, "documentPage", retDocPage)
+	// err = templates.ExecuteTemplate(w, "documentPage", newsDoc)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

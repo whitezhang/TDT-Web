@@ -5,6 +5,7 @@
 	<body>
 		<div class="block-documents">
 			<div>
+				{{with .NewsDoc}}
 				<h2><strong>
 					{{if .Title}}
 						{{.Title}}
@@ -18,6 +19,15 @@
 					<p>{{.MainStory}}</p>
 				</blockquote>
 				<small>This is from {{.Source}}.<br/>Go to <a href="{{.URL}}"><cite title="source page">source page</cite></a></small>
+				{{end}}
+			</div>
+			<div>
+				{{with .EntitiesTrends}}
+					{{range $k, $v := .EntityTrendOnTime}}
+						{{$k}}->{{$v}}
+						<br/>
+					{{end}}
+				{{end}}
 			</div>
 		</div>
 	</body>
