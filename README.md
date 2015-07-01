@@ -9,7 +9,7 @@ This is a TDT project
 ```
 python parser.py 1
 ```
-> The second option is discarded since the DBPedia now changes the structure of the response
+> The second option is discarded since the DBPedia has changed the structure of the response
 
 ## plsa.py
 - This is a pLsa procedure that generating the model
