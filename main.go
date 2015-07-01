@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./app"
 	"./dao"
 	"bufio"
 	"fmt"
@@ -17,7 +18,6 @@ import (
 // File path
 const top_words_file = "../plsa/model/top_words.txt"
 const pzd_file = "../plsa/model/p_z_d.txt"
-const indices2id_file = "../plsa/file-path.txt"
 
 // number of topics that shown in the home page
 const num_topics = 10
@@ -53,33 +53,6 @@ func NewSlice(n []float64) *Slice {
 		s.idx[i] = i
 	}
 	return s
-}
-
-/*
- * Usage: find the id according to the index
- */
-func index2Id(index int) (string, error) {
-	fin, err := os.Open(indices2id_file)
-	defer fin.Close()
-	if err != nil {
-		panic(err)
-		return "", err
-	}
-	reader := bufio.NewReader(fin)
-	i := 0
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil || io.EOF == err {
-			break
-		}
-		line = strings.Replace(line, "\n", "", -1)
-		if i == index {
-			info := strings.Split(line, "/")
-			return info[len(info)-1], nil
-		}
-		i++
-	}
-	return "", err
 }
 
 /*
@@ -229,24 +202,26 @@ func topicHandler(w http.ResponseWriter, r *http.Request) {
 	// Map indices to ids
 	documetnsPostingIds := make([]string, num_documents)
 	for index, value := range documentsPostingIndices[:num_documents] {
-		documetnsPostingIds[index], err = index2Id(value)
+		documetnsPostingIds[index], err = app.Index2Id(value)
 	}
 
 	// News
-	docsInPage := make([]dao.NewsData, num_documents)
+	docsInPage := make([]dao.SimpleNewsData, num_documents)
 	for index, value := range documetnsPostingIds {
-		newsData, err := dao.GetNewsDataOnID(value)
+		newsData, err := dao.GetSimpleNewsDataOnID(value)
 		if err != nil {
 			panic(err)
 			return
 		}
 		docsInPage[index] = *newsData
+		fmt.Println(docsInPage[index].Title)
 	}
 
 	// fmt.Println(docsInPage)
 	// Passed parameter
 	pageDict := make(map[string]string)
 	pageDict["keywords"] = keywords
+
 	// Views loading
 	templates := template.Must(template.ParseGlob("./templates/*"))
 	err = templates.ExecuteTemplate(w, "topicPage", docsInPage)
@@ -257,10 +232,30 @@ func topicHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/*
+ * Usage: document page handler(/document?id=xxx)
+ */
+func documentHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	sid := r.Form["id"][0]
+	newsDoc, err := dao.GetNewsDataOnID(sid)
+	idsHasEntity := app.EntityCounter("Pupil")
+	fmt.Println(idsHasEntity)
+	// Views loading
+	templates := template.Must(template.ParseGlob("./templates/*"))
+	err = templates.ExecuteTemplate(w, "documentPage", newsDoc)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func main() {
+	app.GenerateEntitySet()
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/topic", topicHandler)
+	http.HandleFunc("/document", documentHandler)
 	http.ListenAndServe(":8090", nil)
 
 }

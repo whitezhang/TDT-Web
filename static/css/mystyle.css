@@ -8,15 +8,22 @@
 }
 
 .block-center {
+	width: 1050px;
 	margin-left: auto;
 	margin-right: auto;
-	width: 1050px;
 }
 
-.float-left {
+.block-center .float-left {
 	float: left;
 	margin-right: 10px;
 }
-.bot-block {
+
+.block-center .bot-block {
 	margin-top: 10px;
+}
+
+.block-documents {
+	width: 800px;
+	margin-left: auto;
+	margin-right: auto;
 }

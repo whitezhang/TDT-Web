@@ -1,0 +1,25 @@
+{{define "documentPage"}}
+<!DOCTYPE html>
+<html>
+	{{template "header"}}
+	<body>
+		<div class="block-documents">
+			<div>
+				<h2><strong>
+					{{if .Title}}
+						{{.Title}}
+					{{else}}
+						No Title
+					{{end}}
+				</strong></h2>
+				<h3>{{.TimeStamp}}</h3>
+				<h4>Category: {{.Category}}</h4>
+				<blockquote>
+					<p>{{.MainStory}}</p>
+				</blockquote>
+				<small>This is from {{.Source}}.<br/>Go to <a href="{{.URL}}"><cite title="source page">source page</cite></a></small>
+			</div>
+		</div>
+	</body>
+</html>
+{{end}}
