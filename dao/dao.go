@@ -13,6 +13,7 @@ type Twitter struct {
 }
 
 type NewsData struct {
+	ID          string
 	Title       string `bson:"title" json:"title"`
 	TimeStamp   string `bson:"timeStamp" json:"timeStamp"`
 	Description string `bson:"description" json:"description"`
@@ -38,11 +39,15 @@ func GetNewsDataOnID(sid string) (*NewsData, error) {
 	}
 	re, _ := regexp.Compile("</?\\w+[^>]*>")
 	result.MainStory = re.ReplaceAllString(result.MainStory, "")
+	result.ID = sid
 	// fmt.Println(result.Title)
 	// fmt.Println(result.TimeStamp)
 	return &result, nil
 }
 
+/*
+ * Discarded
+ */
 func GetNewsData() (*[]NewsData, error) {
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
