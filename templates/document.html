@@ -34,7 +34,7 @@
 		<div>
 			{{with .EntitiesTrends}}
 					{{range $k, $v := .EntityTrendOnTime}}
-					 <a href="javascript:showMyTrend()" class="btn btn-default">{{$k}}</a>
+					 <a href="javascript:showMyTrend( '{{$k}}' )" class="btn btn-default">{{$k}}</a>
 			{{end}}
 				{{end}}
 </div>
