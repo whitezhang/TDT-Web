@@ -2,29 +2,29 @@
 <!DOCTYPE html>
 <html>
 	{{template "header"}}
-	<body>
-		{{range .}}
-		<div class="panel panel-default block-documents">
-			<div class="panel-heading">
-				<a href="/document?id={{.ID}}">
-					{{if .Title}}
+<body>
+	{{range .}}
+	<div class="panel panel-default block-documents">
+		<div class="panel-heading">
+			<a href="/document?id={{.ID}}">
+				{{if .Title}}
 						{{.Title}}
 					{{else}}
 						No Title
 					{{end}}
-				</a>
-				<br />
-				{{.TimeStamp}}
-			</div>
-			<div class="panel-body">
-				{{if .Description}}
+			</a>
+			<br />
+			{{.TimeStamp}}
+		</div>
+		<div class="panel-body">
+			{{if .Description}}
 					{{.Description}}
 				{{else}}
 					Sorry, there is no description here :(
 				{{end}}
-			</div>
 		</div>
-		{{end}}
-	</body>
+	</div>
+	{{end}}
+</body>
 </html>
 {{end}}

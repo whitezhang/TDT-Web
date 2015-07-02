@@ -2,34 +2,45 @@
 <!DOCTYPE html>
 <html>
 	{{template "header"}}
-	<body>
-		<div class="block-documents">
-			<div>
-				{{with .NewsDoc}}
-				<h2><strong>
-					{{if .Title}}
+<body>
+	<div class="block-documents">
+		<div>
+			{{with .NewsDoc}}
+			<h2> <strong>{{if .Title}}
 						{{.Title}}
 					{{else}}
 						No Title
-					{{end}}
-				</strong></h2>
-				<h3>{{.TimeStamp}}</h3>
-				<h4>Category: {{.Category}}</h4>
-				<blockquote>
-					<p>{{.MainStory}}</p>
-				</blockquote>
-				<small>This is from {{.Source}}.<br/>Go to <a href="{{.URL}}"><cite title="source page">source page</cite></a></small>
-				{{end}}
-			</div>
-			<div>
-				{{with .EntitiesTrends}}
+					{{end}}</strong> 
+			</h2>
+			<h3>{{.TimeStamp}}</h3>
+			<h4>Category: {{.Category}}</h4>
+			<blockquote>
+				<p>{{.MainStory}}</p>
+			</blockquote>
+			<small>
+				This is from {{.Source}}.
+				<br/>
+				Go to
+				<a href="{{.URL}}">
+					<cite title="source page">source page</cite>
+				</a>
+			</small>
+			{{end}}
+		</div>
+
+		<div id="trendsInfo" data-info="{{.EntitiesTrends.EntityTrendOnTime}}"></div>
+
+		<canvas id="trendsLineChart" width="800" height="400"></canvas>
+		<div>
+			{{with .EntitiesTrends}}
 					{{range $k, $v := .EntityTrendOnTime}}
 						{{$k}}->{{$v}}
-						<br/>
-					{{end}}
+			<br/>
+			{{end}}
 				{{end}}
-			</div>
-		</div>
-	</body>
+</div>
+</div>
+</body>
+{{template "footer"}}
 </html>
 {{end}}
