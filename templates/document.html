@@ -29,17 +29,19 @@
 		</div>
 
 		<div id="trendsInfo" data-info="{{.EntitiesTrends.EntityTrendOnTime}}"></div>
-		<canvas id="trendsLineChart" width="800" height="400"></canvas>
-
-		<div>
-			{{with .EntitiesTrends}}
+		<hr>
+		<div class="my-block-entities">
+			<div id="my-btn-group-vertical" class="btn-group-vertical">
+				{{with .EntitiesTrends}}
 					{{range $k, $v := .EntityTrendOnTime}}
-					 <a href="javascript:showMyTrend( '{{$k}}' )" class="btn btn-default">{{$k}}</a>
-			{{end}}
+				<a href="javascript:showMyTrend( '{{$k}}' )" class="btn btn-default">{{$k}}</a>
 				{{end}}
-</div>
-</div>
+				{{end}}
+			</div>
+			<canvas id="trendsLineChart"></canvas>
+		</div>
+	</div>
 </body>
-{{template "footer"}}
+	{{template "footer"}}
 </html>
 {{end}}

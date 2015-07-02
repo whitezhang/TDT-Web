@@ -7,6 +7,15 @@
 	margin-top: 10px;
 }
 
+#trendsLineChart {
+	width: 800px;
+	height: 400px;
+}
+
+#my-btn-group-vertical {
+	vertical-align: top;
+}
+
 .block-center {
 	width: 1050px;
 	margin-left: auto;
@@ -23,7 +32,7 @@
 }
 
 .block-documents {
-	width: 800px;
+	width: 1100px;
 	margin-left: auto;
 	margin-right: auto;
 }
