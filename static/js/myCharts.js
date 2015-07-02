@@ -50,3 +50,8 @@ var lineChartData = {
 };
 
 new Chart(document.getElementById("trendsLineChart").getContext("2d")).Line(lineChartData);
+
+
+function showMyTrend() {
+    document.write("fsfsd");
+}
