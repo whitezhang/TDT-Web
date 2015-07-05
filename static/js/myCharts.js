@@ -98,7 +98,7 @@ for (var i in eachTrend) {
     // name = "Scotland_Yard:"
     var name = eachTrend[i].match(/(\w)*:/g);
     nameSet.push(name.slice(0, -1))
-        // dataStr = "0 7 4 3 1 4 5 2 7 3 2 1 8 5 9 4 4 1 0 4 3 4 10 8 10 4 8 3 9 3 11"
+    // dataStr = "0 7 4 3 1 4 5 2 7 3 2 1 8 5 9 4 4 1 0 4 3 4 10 8 10 4 8 3 9 3 11"
     var dataStr = eachTrend[i].match(/(\d)+/g);
 
     var dataArray = new Array();

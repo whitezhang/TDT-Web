@@ -2,22 +2,32 @@
 <!DOCTYPE html>
 <html>
 	{{template "header"}}
-	<body onload="initialize()">
-		<div class="block-center">
-			<div>
-				<div class="btn-group-vertical float-left">
-					{{range .Topics}}
-						<a href="/topic?keywords={{.}}" class="btn btn-default">{{.}}</a>
+<body onload="initialize()">
+	<div class="block-center">
+		<div>
+			<div class="btn-group-vertical float-left">
+				{{with .TopicsModels}}
+					{{range $k, $v := .Topics}}
+				<a href="/topic?keywords={{$v}}" class="btn btn-default" onmouseover="showMyTopicTrend( '{{$k}}' )">{{$v}}</a>
+				{{end}}
 					{{end}}
-					<p>Date: <input type="text" id="datepicker"></p>
-				</div>
-				<div id="googleMap"></div>
+				<p>
+					Date:
+					<input type="text" id="datepicker"></p>
 			</div>
-
-			<div class="bot-block">
-				Global Semantic Graph
-			</div>
+			<!-- <div id="googleMap"></div>
+		-->
+		<div>
+			<div id="topicsTrendsInfo" data-info="{{.TopicsTrends.TopicCount}}"></div>
+			<canvas id="topicsTrendsLineChart"></canvas>
 		</div>
-	</body>
+	</div>
+
+	<div class="bot-block">Global Semantic Graph</div>
+</div>
+</body>
+<footer>
+	<script src="/static/js/myTopicCharts.js"></script>
+</footer>
 </html>
 {{end}}

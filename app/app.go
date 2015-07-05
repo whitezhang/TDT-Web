@@ -26,6 +26,8 @@ var ExpEntitySet EntitySet
 
 /*
  * Usage: find the id according to the index
+ * e.g.
+ *		0 -> 5536def4e4b0644323e219a8
  */
 func Index2Id(index int) (string, error) {
 	fin, err := os.Open(indices2id_file)

@@ -50,6 +50,9 @@ type TopicPostingList struct {
 /*
  * Usage: Trends struct
  */
+type TopicTrendsOnTime struct {
+	TopicCount [][]float64
+}
 
 type EntityTrendOnTime struct {
 	EntityCount []int
@@ -117,6 +120,45 @@ func loadTopicModels() (*TopicModels, error) {
 	}
 
 	return &TopicModels{Topics: topics[:]}, nil
+}
+
+func generateTopicTrends() (*TopicTrendsOnTime, error) {
+	var topicTrendsOneTime TopicTrendsOnTime
+
+	fin, err := os.Open(pzd_file)
+	defer fin.Close()
+	if err != nil {
+		panic(err)
+		return nil, err
+	}
+	reader := bufio.NewReader(fin)
+
+	// Init
+	i := 0
+	topicTrendsOneTime.TopicCount = make([][]float64, num_topics)
+	for i := range topicTrendsOneTime.TopicCount {
+		topicTrendsOneTime.TopicCount[i] = make([]float64, 31)
+	}
+
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil || io.EOF == err {
+			break
+		}
+		docId, _ := app.Index2Id(i)
+		timeStamp, _ := dao.GetTimeStampOnID(docId)
+		day, _, _ := app.SplitDate(timeStamp.TimeStamp)
+
+		line = strings.Replace(line, "\n", "", -1)
+		info := strings.Split(line, ": ")
+		probsString := info[1]
+		for index, probString := range strings.Split(probsString, " ") {
+			prob, _ := strconv.ParseFloat(probString, 64)
+			topicTrendsOneTime.TopicCount[index][day] += prob
+		}
+		i++
+	}
+	return &topicTrendsOneTime, nil
 }
 
 // Usage: generate topic posting indices based on index
@@ -199,10 +241,19 @@ func findTopicPosition(topics string) int {
  */
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	topicsModels, _ := loadTopicModels()
+	topicsTrends, _ := generateTopicTrends()
 
 	// Views loading
 	templates := template.Must(template.ParseGlob("./templates/*"))
-	err := templates.ExecuteTemplate(w, "indexPage", topicsModels)
+	var topicInfo struct {
+		TopicsModels *TopicModels
+		TopicsTrends *TopicTrendsOnTime
+	}
+	topicInfo.TopicsModels = topicsModels
+	topicInfo.TopicsTrends = topicsTrends
+
+	// err := templates.ExecuteTemplate(w, "indexPage", topicsModels)
+	err := templates.ExecuteTemplate(w, "indexPage", topicInfo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

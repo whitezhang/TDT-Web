@@ -12,6 +12,11 @@
 	height: 400px;
 }
 
+#topicsTrendsLineChart {
+	width: 650px;
+	height: 400px;
+}
+
 #my-btn-group-vertical {
 	vertical-align: top;
 }
