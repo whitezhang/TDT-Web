@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const indices2id_file = "../plsa/file-path.txt"
+const indices2id_file = "../plsa/month4/file-path.txt"
 const entity_path = "/Users/wyatt/Documents/Code/Gla/Final/Sources/web/db/gms/r_month-4/"
 
 type EntityNode struct {

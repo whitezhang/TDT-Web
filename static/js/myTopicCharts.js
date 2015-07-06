@@ -122,10 +122,10 @@ var lineChartData = {
 
 var chart = new Chart(document.getElementById("topicsTrendsLineChart").getContext("2d")).Line(lineChartData, options);
 
-function showMyTopicTrend(topicDataName) {
+function showMyTopicTrend(topicDataIndex) {
     dataId = -1;
     for (var i = 0; i < IdSet.length; i++) {
-        if (topicDataName == IdSet[i]) {
+        if (topicDataIndex == IdSet[i]) {
             dataId = i;
             break;
         }
@@ -140,6 +140,36 @@ function showMyTopicTrend(topicDataName) {
     lineChartData["datasets"][dataId]["fillColor"] = "rgba(0,0,0,1)";
     lineChartData["datasets"][dataId]["strokeColor"] = "rgba(0,0,0,1)";
     lineChartData["datasets"][dataId]["pointColor"] = "rgba(0,0,0,1)";
+
+    chart = new Chart(document.getElementById("topicsTrendsLineChart").getContext("2d")).Line(lineChartData, options);
+};
+
+
+function showOurTrends(rowIndex, colIndex) {
+    rowId = -1;
+    colId = -1;
+    for (var i = 0; i < IdSet.length; i++) {
+        if (rowIndex == IdSet[i]) {
+            rowId = i;
+        }
+        if (colIndex == IdSet[i]) {
+            colId = i;
+        }
+    }
+    tmpDatasets = lineChartData["datasets"]
+    for (var i = 0; i < tmpDatasets.length; i++) {
+        tmpDatasets[i]["fillColor"] = "rgba(220,220,220,0.1)";
+        tmpDatasets[i]["strokeColor"] = "rgba(220,220,220,0.1)";
+        tmpDatasets[i]["pointColor"] = "rgba(220,220,220,0)";
+    }
+
+    lineChartData["datasets"][rowId]["fillColor"] = "rgba(88,220,220,0.5)";
+    lineChartData["datasets"][rowId]["strokeColor"] = "rgba(88,220,220,1)";
+    lineChartData["datasets"][rowId]["pointColor"] = "rgba(88,220,220,1)";
+
+    lineChartData["datasets"][colId]["fillColor"] = "rgba(151,187,205,0.5)";
+    lineChartData["datasets"][colId]["strokeColor"] = "rgba(151,187,205,1)";
+    lineChartData["datasets"][colId]["pointColor"] = "rgba(151,187,205,1)";
 
     chart = new Chart(document.getElementById("topicsTrendsLineChart").getContext("2d")).Line(lineChartData, options);
 };

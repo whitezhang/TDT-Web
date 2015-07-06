@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"sort"
@@ -16,8 +17,9 @@ import (
 
 // Const Variable
 // File path
-const top_words_file = "../plsa/model/top_words.txt"
-const pzd_file = "../plsa/model/p_z_d.txt"
+const top_words_file = "../plsa/month4/model/top_words.txt"
+const pzd_file = "../plsa/month4/model/p_z_d.txt"
+const pwz_file = "../plsa/month4/model/p_w_z.txt"
 
 // number of topics that shown in the home page
 const num_topics = 10
@@ -25,6 +27,14 @@ const num_topics = 10
 // number of keywords for each topic
 const num_keywords = 5
 const num_documents = 10
+
+/*
+ * Make the computation going when starting the server
+ */
+var topicWordsDistribution = make([]TopicWordsDistribution, 10)
+
+// KLDivergence[i][j] means KL(i||j)
+var KLDivergenceS [num_topics][num_topics]string
 
 // var templates = template.Must(template.ParseGlob("./templates/*"))
 
@@ -45,6 +55,10 @@ type TopicModels struct {
 
 type TopicPostingList struct {
 	DocumentsProb [num_topics][]float64
+}
+
+type TopicWordsDistribution struct {
+	prob []float64
 }
 
 /*
@@ -161,6 +175,68 @@ func generateTopicTrends() (*TopicTrendsOnTime, error) {
 	return &topicTrendsOneTime, nil
 }
 
+//
+func loadPWZ() error {
+	fin, err := os.Open(pwz_file)
+	defer fin.Close()
+	if err != nil {
+		panic(err)
+		return err
+	}
+	reader := bufio.NewReader(fin)
+	i := 0
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil || io.EOF == err {
+			break
+		}
+		line = strings.Replace(line, "\n", "", -1)
+		info := strings.Split(line, ": ")
+		probsString := info[1]
+		for _, probString := range strings.Split(probsString, " ") {
+			prob, _ := strconv.ParseFloat(probString, 64)
+			topicWordsDistribution[i].prob = append(topicWordsDistribution[i].prob, prob)
+		}
+		i++
+	}
+	// fmt.Println(topicWordsDistribution)
+	return nil
+}
+
+func significantFigures(KLDivergence [num_topics][num_topics]float64) {
+	rows := len(KLDivergence)
+	cols := len(KLDivergence[0])
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			if KLDivergence[i][j] == 0 {
+				KLDivergenceS[i][j] = "0.0"
+				continue
+			}
+			KLDivergenceS[i][j] = strconv.FormatFloat(KLDivergence[i][j], 'f', 4, 64)
+		}
+	}
+}
+
+func generateKLDivergence() {
+	var KLDivergence [num_topics][num_topics]float64
+	length := len(topicWordsDistribution)
+	lengthProb := len(topicWordsDistribution[0].prob)
+	for i := 0; i < length; i++ {
+		for j := 0; j < length; j++ {
+			if i == j {
+				continue
+			}
+			for k := 0; k < lengthProb; k++ {
+				tmpKL := topicWordsDistribution[i].prob[k] * math.Log(topicWordsDistribution[i].prob[k]/topicWordsDistribution[j].prob[k])
+				if !(math.IsNaN(tmpKL) || math.IsInf(tmpKL, 1)) {
+					KLDivergence[i][j] += tmpKL
+				}
+			}
+		}
+	}
+	significantFigures(KLDivergence)
+}
+
 // Usage: generate topic posting indices based on index
 func generateTopicPostingList(index int) ([]int, error) {
 	var topicPostingList TopicPostingList
@@ -248,9 +324,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	var topicInfo struct {
 		TopicsModels *TopicModels
 		TopicsTrends *TopicTrendsOnTime
+		KLDivergence [num_topics][num_topics]string
 	}
 	topicInfo.TopicsModels = topicsModels
 	topicInfo.TopicsTrends = topicsTrends
+	topicInfo.KLDivergence = KLDivergenceS
 
 	// err := templates.ExecuteTemplate(w, "indexPage", topicsModels)
 	err := templates.ExecuteTemplate(w, "indexPage", topicInfo)
@@ -355,6 +433,8 @@ func documentHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	app.GenerateEntitySet()
+	loadPWZ()
+	generateKLDivergence()
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/topic", topicHandler)
