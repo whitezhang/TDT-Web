@@ -26,7 +26,9 @@ const num_topics = 10
 
 // number of keywords for each topic
 const num_keywords = 5
-const num_documents = 10
+
+// const num_documents = 10
+const threshold_document = 0.5
 
 /*
  * Make the computation going when starting the server
@@ -258,14 +260,15 @@ func generateTopicPostingList(index int) ([]int, error) {
 		probsString := info[1]
 		for index, probString := range strings.Split(probsString, " ") {
 			prob, _ := strconv.ParseFloat(probString, 64)
-			topicPostingList.DocumentsProb[index] = append(topicPostingList.DocumentsProb[index], prob)
+			if prob > 0.5 {
+				topicPostingList.DocumentsProb[index] = append(topicPostingList.DocumentsProb[index], prob)
+			}
 		}
 	}
 
 	probsList := NewSlice(topicPostingList.DocumentsProb[index])
 	sort.Sort(probsList)
 	// s.idx is the indices of the slice
-	// fmt.Println(probsList.idx)
 	return probsList.idx, nil
 }
 
@@ -352,6 +355,7 @@ func topicHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Map indices to ids
+	num_documents := len(documentsPostingIndices)
 	documetnsPostingIds := make([]string, num_documents)
 	for index, value := range documentsPostingIndices[:num_documents] {
 		documetnsPostingIds[index], err = app.Index2Id(value)
@@ -366,10 +370,8 @@ func topicHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		docsInPage[index] = *newsData
-		fmt.Println(docsInPage[index].Title)
 	}
 
-	// fmt.Println(docsInPage)
 	// Passed parameter
 	pageDict := make(map[string]string)
 	pageDict["keywords"] = keywords
@@ -396,22 +398,18 @@ func documentHandler(w http.ResponseWriter, r *http.Request) {
 	retDocPage.NewsDoc = *newsDoc
 	// Demo
 	// Get IDs that has this entity
-	// fmt.Println(sid, "----", app.ExpEntitySet.ExpEntityNode[sid])
 	var entitiesTrends EntitiesTrends
 	entitiesTrends.EntityTrendOnTime = make(map[string]EntityTrendOnTime)
 
 	for _, name := range app.ExpEntitySet.ExpEntityNode[sid].ExpEntity {
 		entitiesTrends.EntityTrendOnTime[name] = EntityTrendOnTime{EntityCount: make([]int, 31)}
-		fmt.Println(name)
 		idsHasEntity := app.GetIdsFromEntity(name)
 		for _, id := range idsHasEntity {
 			timeStamp, _ := dao.GetTimeStampOnID(id)
-			fmt.Println(id, timeStamp.TimeStamp)
 			day, _, _ := app.SplitDate(timeStamp.TimeStamp)
 			entitiesTrends.EntityTrendOnTime[name].EntityCount[day]++
 		}
 	}
-	fmt.Println(entitiesTrends)
 	retDocPage.EntitiesTrends = entitiesTrends
 	// Test
 	// idsHasEntity := app.GetIdsFromEntity("Pupil")

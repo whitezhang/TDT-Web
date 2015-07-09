@@ -127,9 +127,9 @@ func GetTwitters() (*[]Twitter, error) {
 		return nil, err
 	}
 
-	for _, v := range result {
-		fmt.Println(v.Text)
-	}
+	// for _, v := range result {
+	// 	fmt.Println(v.Text)
+	// }
 
 	return &result, nil
 }
