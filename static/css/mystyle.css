@@ -29,6 +29,7 @@
 
 .btn:hover {
   background-color: #88eeee;
+  color: black;
 }
 
 .block-center {
