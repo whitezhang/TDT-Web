@@ -28,7 +28,7 @@ const num_topics = 10
 const num_keywords = 5
 
 // const num_documents = 10
-const threshold_document = 0.5
+const doc_threshold = 0.5
 
 /*
  * Make the computation going when starting the server
@@ -201,7 +201,6 @@ func loadPWZ() error {
 		}
 		i++
 	}
-	// fmt.Println(topicWordsDistribution)
 	return nil
 }
 
@@ -260,7 +259,7 @@ func generateTopicPostingList(index int) ([]int, error) {
 		probsString := info[1]
 		for index, probString := range strings.Split(probsString, " ") {
 			prob, _ := strconv.ParseFloat(probString, 64)
-			if prob > 0.5 {
+			if prob > doc_threshold {
 				topicPostingList.DocumentsProb[index] = append(topicPostingList.DocumentsProb[index], prob)
 			}
 		}

@@ -27,6 +27,10 @@
 	border: 0px;
 }
 
+.btn:hover {
+  background-color: #88eeee;
+}
+
 .block-center {
 	width: 1050px;
 	margin-left: auto;

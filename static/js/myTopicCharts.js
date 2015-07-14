@@ -137,9 +137,9 @@ function showMyTopicTrend(topicDataIndex) {
         tmpDatasets[i]["pointColor"] = "rgba(220,220,220,0)";
     }
 
-    lineChartData["datasets"][dataId]["fillColor"] = "rgba(0,0,0,1)";
-    lineChartData["datasets"][dataId]["strokeColor"] = "rgba(0,0,0,1)";
-    lineChartData["datasets"][dataId]["pointColor"] = "rgba(0,0,0,1)";
+    lineChartData["datasets"][dataId]["fillColor"] = "rgba(88,220,220,0.5)";
+    lineChartData["datasets"][dataId]["strokeColor"] = "rgba(88,220,220,0.5)";
+    lineChartData["datasets"][dataId]["pointColor"] = "rgba(88,220,220,0.5)";
 
     chart = new Chart(document.getElementById("topicsTrendsLineChart").getContext("2d")).Line(lineChartData, options);
 };
