@@ -17,9 +17,12 @@ import (
 
 // Const Variable
 // File path
-const top_words_file = "../plsa/month4/model/top_words.txt"
-const pzd_file = "../plsa/month4/model/p_z_d.txt"
-const pwz_file = "../plsa/month4/model/p_w_z.txt"
+// const basic_path = "../plsa/month4/"
+
+const basic_path = "../plsa/data/gap/gap7/1/"
+const top_words_file = basic_path + "model/top_words.txt"
+const pzd_file = basic_path + "model/p_z_d.txt"
+const pwz_file = basic_path + "model/p_w_z.txt"
 
 // number of topics that shown in the home page
 const num_topics = 10
@@ -76,6 +79,23 @@ type EntityTrendOnTime struct {
 
 type EntitiesTrends struct {
 	EntityTrendOnTime map[string]EntityTrendOnTime
+}
+
+/*
+ * Sort []dao.SimpleNewsData based on timeStamp
+ */
+type ByLength []dao.SimpleNewsData
+
+func (s ByLength) Len() int {
+	return len(s)
+}
+
+func (s ByLength) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s ByLength) Less(i, j int) bool {
+	return len(s[i].TimeStamp) < len(s[j].TimeStamp)
 }
 
 // Usage: get the indices of the sorted slice
@@ -360,7 +380,7 @@ func topicHandler(w http.ResponseWriter, r *http.Request) {
 		documetnsPostingIds[index], err = app.Index2Id(value)
 	}
 
-	// News
+	// Get documents based on num_documents
 	docsInPage := make([]dao.SimpleNewsData, num_documents)
 	for index, value := range documetnsPostingIds {
 		newsData, err := dao.GetSimpleNewsDataOnID(value)
@@ -370,6 +390,8 @@ func topicHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		docsInPage[index] = *newsData
 	}
+	// Sort docsInPage based on time stamp
+	sort.Sort(ByLength(docsInPage))
 
 	// Passed parameter
 	pageDict := make(map[string]string)
