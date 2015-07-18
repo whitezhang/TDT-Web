@@ -17,7 +17,8 @@ import (
 
 // Const Variable
 // File path
-const basic_path = "../plsa/month4/"
+// const basic_path = "../plsa/month4/"
+const basic_path = "../plsa"
 
 // const basic_path = "../plsa/data/gap7_t10/15"
 // const basic_path = "../plsa/data/gap/gap7/1"
@@ -27,7 +28,7 @@ const pzd_file = basic_path + "/" + model_file_name + "/p_z_d.txt"
 const pwz_file = basic_path + "/" + model_file_name + "/p_w_z.txt"
 
 // number of topics that shown in the home page
-const num_topics = 10
+const num_topics = 20
 
 // number of keywords for each topic
 const num_keywords = 5
@@ -62,6 +63,7 @@ type TopicModels struct {
 
 type TopicPostingList struct {
 	DocumentsProb [num_topics][]float64
+	DocumentsId   [num_topics][]int
 }
 
 type TopicWordsDistribution struct {
@@ -277,6 +279,7 @@ func generateTopicPostingList(index int) ([]int, error) {
 		return nil, err
 	}
 	reader := bufio.NewReader(fin)
+	num_line := 0
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil || io.EOF == err {
@@ -289,14 +292,18 @@ func generateTopicPostingList(index int) ([]int, error) {
 			prob, _ := strconv.ParseFloat(probString, 64)
 			if prob > doc_threshold {
 				topicPostingList.DocumentsProb[index] = append(topicPostingList.DocumentsProb[index], prob)
+				topicPostingList.DocumentsId[index] = append(topicPostingList.DocumentsId[index], num_line)
+				fmt.Println(prob)
 			}
 		}
+		num_line++
 	}
+	return topicPostingList.DocumentsId[index], nil
 
-	probsList := NewSlice(topicPostingList.DocumentsProb[index])
-	sort.Sort(probsList)
+	// probsList := NewSlice(topicPostingList.DocumentsProb[index])
+	// sort.Sort(probsList)
 	// s.idx is the indices of the slice
-	return probsList.idx, nil
+	// return probsList.idx, nil
 }
 
 // Discarded
