@@ -17,17 +17,17 @@ import (
 
 // Const Variable
 // File path
-// const basic_path = "../plsa/month4/"
+const basic_path = "../plsa/month4/"
 
 // const basic_path = "../plsa/data/gap7_t10/15"
-const basic_path = "../plsa/data/gap/gap7/1"
-const model_file_name = "model5"
+// const basic_path = "../plsa/data/gap/gap7/1"
+const model_file_name = "model"
 const top_words_file = basic_path + "/" + model_file_name + "/top_words.txt"
 const pzd_file = basic_path + "/" + model_file_name + "/p_z_d.txt"
 const pwz_file = basic_path + "/" + model_file_name + "/p_w_z.txt"
 
 // number of topics that shown in the home page
-const num_topics = 5
+const num_topics = 10
 
 // number of keywords for each topic
 const num_keywords = 5
@@ -256,9 +256,8 @@ func generateKLDivergence() {
 				// JS Divergence
 				tmpKL1 := topicWordsDistribution[i].prob[k] * math.Log(topicWordsDistribution[i].prob[k]/((topicWordsDistribution[j].prob[k]+topicWordsDistribution[i].prob[k])/2.0))
 				tmpKL2 := topicWordsDistribution[j].prob[k] * math.Log(topicWordsDistribution[j].prob[k]/((topicWordsDistribution[i].prob[k]+topicWordsDistribution[j].prob[k])/2.0))
-				fmt.Println(topicWordsDistribution[i].prob[k], topicWordsDistribution[j].prob[k], topicWordsDistribution[j].prob[k]/(topicWordsDistribution[i].prob[k]+topicWordsDistribution[j].prob[k])/2.0, topicWordsDistribution[i].prob[k]/(topicWordsDistribution[j].prob[k]+topicWordsDistribution[i].prob[k])/2.0, tmpKL1, tmpKL2)
 				// tmpKL := topicWordsDistribution[i].prob[k] * math.Log(topicWordsDistribution[i].prob[k]/topicWordsDistribution[j].prob[k])
-				if !(math.IsNaN(tmpKL1) || math.IsInf(tmpKL1, 1)) {
+				if !(math.IsNaN(tmpKL1) || math.IsInf(tmpKL1, 1) || math.IsNaN(tmpKL2) || math.IsInf(tmpKL2, 1)) {
 					KLDivergence[i][j] += tmpKL1 + tmpKL2
 				}
 			}
