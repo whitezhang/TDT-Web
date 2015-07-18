@@ -19,24 +19,26 @@ import (
 // File path
 // const basic_path = "../plsa/month4/"
 
-const basic_path = "../plsa/data/gap/gap7/1/"
-const top_words_file = basic_path + "model/top_words.txt"
-const pzd_file = basic_path + "model/p_z_d.txt"
-const pwz_file = basic_path + "model/p_w_z.txt"
+// const basic_path = "../plsa/data/gap7_t10/15"
+const basic_path = "../plsa/data/gap/gap7/1"
+const model_file_name = "model5"
+const top_words_file = basic_path + "/" + model_file_name + "/top_words.txt"
+const pzd_file = basic_path + "/" + model_file_name + "/p_z_d.txt"
+const pwz_file = basic_path + "/" + model_file_name + "/p_w_z.txt"
 
 // number of topics that shown in the home page
-const num_topics = 10
+const num_topics = 5
 
 // number of keywords for each topic
 const num_keywords = 5
 
 // const num_documents = 10
-const doc_threshold = 0.5
+const doc_threshold = 0.8
 
 /*
  * Make the computation going when starting the server
  */
-var topicWordsDistribution = make([]TopicWordsDistribution, 10)
+var topicWordsDistribution = make([]TopicWordsDistribution, num_topics)
 
 // KLDivergence[i][j] means KL(i||j)
 var KLDivergenceS [num_topics][num_topics]string
@@ -182,6 +184,9 @@ func generateTopicTrends() (*TopicTrendsOnTime, error) {
 			break
 		}
 		docId, _ := app.Index2Id(i)
+		if docId == "" {
+			break
+		}
 		timeStamp, _ := dao.GetTimeStampOnID(docId)
 		day, _, _ := app.SplitDate(timeStamp.TimeStamp)
 
@@ -248,9 +253,13 @@ func generateKLDivergence() {
 				continue
 			}
 			for k := 0; k < lengthProb; k++ {
-				tmpKL := topicWordsDistribution[i].prob[k] * math.Log(topicWordsDistribution[i].prob[k]/topicWordsDistribution[j].prob[k])
-				if !(math.IsNaN(tmpKL) || math.IsInf(tmpKL, 1)) {
-					KLDivergence[i][j] += tmpKL
+				// JS Divergence
+				tmpKL1 := topicWordsDistribution[i].prob[k] * math.Log(topicWordsDistribution[i].prob[k]/((topicWordsDistribution[j].prob[k]+topicWordsDistribution[i].prob[k])/2.0))
+				tmpKL2 := topicWordsDistribution[j].prob[k] * math.Log(topicWordsDistribution[j].prob[k]/((topicWordsDistribution[i].prob[k]+topicWordsDistribution[j].prob[k])/2.0))
+				fmt.Println(topicWordsDistribution[i].prob[k], topicWordsDistribution[j].prob[k], topicWordsDistribution[j].prob[k]/(topicWordsDistribution[i].prob[k]+topicWordsDistribution[j].prob[k])/2.0, topicWordsDistribution[i].prob[k]/(topicWordsDistribution[j].prob[k]+topicWordsDistribution[i].prob[k])/2.0, tmpKL1, tmpKL2)
+				// tmpKL := topicWordsDistribution[i].prob[k] * math.Log(topicWordsDistribution[i].prob[k]/topicWordsDistribution[j].prob[k])
+				if !(math.IsNaN(tmpKL1) || math.IsInf(tmpKL1, 1)) {
+					KLDivergence[i][j] += tmpKL1 + tmpKL2
 				}
 			}
 		}
