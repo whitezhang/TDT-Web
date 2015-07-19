@@ -18,9 +18,10 @@ import (
 // Const Variable
 // File path
 // const basic_path = "../plsa/month4/"
-const basic_path = "../plsa"
+// const basic_path = "../plsa"
 
-// const basic_path = "../plsa/data/gap7_t10/15"
+const basic_path = "../plsa/data/gap7_t10/1"
+
 // const basic_path = "../plsa/data/gap/gap7/1"
 const model_file_name = "model"
 const top_words_file = basic_path + "/" + model_file_name + "/top_words.txt"
@@ -28,7 +29,7 @@ const pzd_file = basic_path + "/" + model_file_name + "/p_z_d.txt"
 const pwz_file = basic_path + "/" + model_file_name + "/p_w_z.txt"
 
 // number of topics that shown in the home page
-const num_topics = 20
+const num_topics = 10
 
 // number of keywords for each topic
 const num_keywords = 5
