@@ -98,6 +98,9 @@ for (var i in eachTrend) {
     IdSet.push(i)
     // dataStr = "0 7 4 3 1 4 5 2 7 3 2 1 8 5 9 4 4 1 0 4 3 4 10 8 10 4 8 3 9 3 11"
     var dataStr = eachTrend[i].match(/(\d|\.|e|\-)+/g);
+    dataStr = dataStr.slice(8,15);
+    // document.write(eachTrend[i]);
+    // document.write(dataStr+"======");
 
     var dataArray = new Array();
     if (dataStr["30"] > 0) {
@@ -107,12 +110,16 @@ for (var i in eachTrend) {
         dataArray[j] = parseInt(dataStr[j]);
     }
     dataMap['data'] = dataArray;
-    trendDataSets.push(dataMap)
+    trendDataSets.push(dataMap);
 }
 
-var daysIndex = new Array()
-for (var i = 0; i <= numDays; i++) {
-    daysIndex[i] = i.toString();
+
+var daysIndex = new Array();
+// for (var i = 0; i <= numDays; i++) {
+//     daysIndex[i] = i.toString();
+// }
+for (var i = 8; i <= 14; i++) {
+    daysIndex[i-8] = i.toString()
 }
 
 var lineChartData = {

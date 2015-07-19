@@ -27,13 +27,17 @@
 	border: 0px;
 }
 
+.my-btn-group-font {
+	font-size: 14px;
+}
+
 .btn:hover {
   background-color: #88eeee;
   color: black;
 }
 
 .block-center {
-	width: 1050px;
+	width: 1350px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -42,6 +46,8 @@
 	float: left;
 	margin-right: 10px;
 }
+
+
 
 .block-center .bot-block {
 	margin-top: 10px;

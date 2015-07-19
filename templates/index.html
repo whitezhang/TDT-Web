@@ -6,11 +6,10 @@
 	<div class="block-center">
 		<div>
 			<div class="btn-group-vertical float-left">
-				{{with .TopicsModels}}
-					{{range $k, $v := .Topics}}
-				<a href="/topic?keywords={{$v}}" class="btn btn-default" onmouseover="showMyTopicTrend( '{{$k}}' )">{{$v}}</a>
+					{{range $k, $v := .TopicsModels.Topics}}
+				<a href="/topic?keywords={{$v}}" class="my-btn-group-font btn btn-default " onmouseover="showMyTopicTrend( '{{$k}}' )">{{index $.EventName $k}}</a>
 				{{end}}
-					{{end}}
+					
 				<p>
 					<!-- Date:
 					<input type="text" id="datepicker"></p>
@@ -24,9 +23,9 @@
 		</div>
 	</div>
 
-	<div class="kl-table">
+	<div class="kl-table" style="display:none">
 		{{with .KLDivergence}}
-		<h3>JS Divergence(Will be removed)</h3>
+		<h3>JS Divergence</h3>
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>

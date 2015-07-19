@@ -1,3 +1,5 @@
+// Entity Charts
+
 var options = {
         //Boolean - If we show the scale above the chart data    
         scaleOverlay : false,

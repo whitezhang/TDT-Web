@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const indices2id_file = "../plsa/data/gap7_t10/1/model/file-path.txt"
+const indices2id_file = "../plsa/data/gap7_t10/8/model/file-path.txt"
 
 // const indices2id_file = "../plsa/month4/file-path.txt"
 // const indices2id_file = "../plsa/file-path.txt"

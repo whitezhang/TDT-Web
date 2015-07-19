@@ -20,7 +20,7 @@ import (
 // const basic_path = "../plsa/month4/"
 // const basic_path = "../plsa"
 
-const basic_path = "../plsa/data/gap7_t10/1"
+const basic_path = "../plsa/data/gap7_t10/8"
 
 // const basic_path = "../plsa/data/gap/gap7/1"
 const model_file_name = "model"
@@ -363,11 +363,22 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		TopicsModels *TopicModels
 		TopicsTrends *TopicTrendsOnTime
 		KLDivergence [num_topics][num_topics]string
+		EventName    [num_topics]string
 	}
 	topicInfo.TopicsModels = topicsModels
 	topicInfo.TopicsTrends = topicsTrends
 	topicInfo.KLDivergence = KLDivergenceS
-
+	// Change it
+	topicInfo.EventName[0] = "Kiltwalk: I'll walk 156 miles inspired by the memories of Little Braveheart brother's smiles"
+	topicInfo.EventName[1] = "Karen Buckley: Fears grow for missing woman"
+	topicInfo.EventName[2] = "Steal or no steal: Scots pharmacist who won £2.50 on TV game show charged with prescription drug theft"
+	topicInfo.EventName[3] = "Scots expert helps bust organised crime ring that smuggled over £1m worth of ancient artefacts"
+	topicInfo.EventName[4] = "War on drugs: Leading writer Johann Hari says Scotland should abandon failed policy of prohibition"
+	topicInfo.EventName[5] = "Hero diver fled to Australia to escape his Piper Alpha hell.. and wed the love of his life"
+	topicInfo.EventName[6] = "Gordon Brown calls for immediate release of 219 schoolgirls one year on from their abduction in Nigeria"
+	topicInfo.EventName[7] = "T in the Park 2015: New blow for event organisers as campaigners claim rare birds are nesting on the site"
+	topicInfo.EventName[8] = "RECAP: Andy Murray and Kim Sears Wedding Day in Dunblane"
+	topicInfo.EventName[9] = "'When A Man Loves A Woman' singer Percy Sledge dies, aged 74"
 	// err := templates.ExecuteTemplate(w, "indexPage", topicsModels)
 	err := templates.ExecuteTemplate(w, "indexPage", topicInfo)
 	if err != nil {
