@@ -16,6 +16,7 @@ const indices2id_file = "../plsa/data/gap7_t10/8/model/file-path.txt"
 // const indices2id_file = "../plsa/month4/file-path.txt"
 // const indices2id_file = "../plsa/file-path.txt"
 const entity_path = "/Users/wyatt/Documents/Code/Gla/Final/Sources/web/db/gms/r_month-4/"
+const kl_g7_15_file = "./db/js-g7-15.txt"
 
 type EntityNode struct {
 	ExpEntity []string
@@ -26,6 +27,37 @@ type EntitySet struct {
 }
 
 var ExpEntitySet EntitySet
+
+func NewEventDetect() ([]int, error) {
+	var EventRelationList []int
+	fin, err := os.Open(kl_g7_15_file)
+	defer fin.Close()
+	if err != nil {
+		panic(err)
+		return nil, err
+	}
+	reader := bufio.NewReader(fin)
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil || io.EOF == err {
+			break
+		}
+		line = strings.Replace(strings.TrimSpace(line), "\n", "", -1)
+		info := strings.Split(line, " ")
+		minValue := 99999.9
+		minIndex := -1
+		for k, v := range info {
+			value, _ := strconv.ParseFloat(v, 64)
+			if value < minValue {
+				minValue = value
+				minIndex = k
+			}
+		}
+		fmt.Println(minValue, minIndex)
+		EventRelationList = append(EventRelationList, minIndex)
+	}
+	return EventRelationList, nil
+}
 
 /*
  * Usage: find the id according to the index

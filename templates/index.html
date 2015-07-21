@@ -5,11 +5,24 @@
 <body onload="initialize()">
 	<div class="block-center">
 		<div>
+			<h1>Today's Topics</h1>
+			{{range $k, $v := .TodayTopicRealtion.TopicsModelsToday.Topics}}
+			{{$key := index $.TodayTopicRealtion.EventRelationList $k}}
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">{{$v}}</h3>
+				</div>
+				<div class="panel-body">Related to Pervious Event -> {{index $.EventName $key}}</div>
+			</div>
+			{{end}}
+		</div>
+		<div>
+			<hr>
+			<h1>Pervious Events</h1>
 			<div class="btn-group-vertical float-left">
-					{{range $k, $v := .TopicsModels.Topics}}
+				{{range $k, $v := .TopicsModels.Topics}}
 				<a href="/topic?keywords={{$v}}" class="my-btn-group-font btn btn-default " onmouseover="showMyTopicTrend( '{{$k}}' )">{{index $.EventName $k}}</a>
 				{{end}}
-					
 				<p>
 					<!-- Date:
 					<input type="text" id="datepicker"></p>
@@ -35,14 +48,16 @@
 					{{end}}
 				</tr>
 				<tbody>
-				{{range $i, $row := .}}
-				<tr class="active">
-					<td>{{$i}}</td>
-					{{range $j, $col := $row}}
-					<td><a href="javascript:showOurTrends( '{{$i}}','{{$j}}' )" id="mybtn-table" class="btn btn-default">{{$col}}</a></td>
+					{{range $i, $row := .}}
+					<tr class="active">
+						<td>{{$i}}</td>
+						{{range $j, $col := $row}}
+						<td>
+							<a href="javascript:showOurTrends( '{{$i}}','{{$j}}' )" id="mybtn-table" class="btn btn-default">{{$col}}</a>
+						</td>
+						{{end}}
+					</tr>
 					{{end}}
-				</tr>
-				{{end}}
 				</tbody>
 			</thead>
 		</table>

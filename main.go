@@ -24,9 +24,13 @@ const basic_path = "../plsa/data/gap7_t10/8"
 
 // const basic_path = "../plsa/data/gap/gap7/1"
 const model_file_name = "model"
-const top_words_file = basic_path + "/" + model_file_name + "/top_words.txt"
+const top_words_file1 = basic_path + "/" + model_file_name + "/top_words.txt"
 const pzd_file = basic_path + "/" + model_file_name + "/p_z_d.txt"
 const pwz_file = basic_path + "/" + model_file_name + "/p_w_z.txt"
+
+const top_words_file_day15 = "./db/day15/model/top_words.txt"
+const pzd_file_day15 = "./db/day15/model/p_z_d.txt"
+const pwd_file_day15 = "./db/day15/model/p_w_z.txt"
 
 // number of topics that shown in the home page
 const num_topics = 10
@@ -86,6 +90,11 @@ type EntitiesTrends struct {
 	EntityTrendOnTime map[string]EntityTrendOnTime
 }
 
+type TodayTopicRelation struct {
+	TopicsModelsToday *TopicModels
+	EventRelationList []int
+}
+
 /*
  * Sort []dao.SimpleNewsData based on timeStamp
  */
@@ -125,7 +134,7 @@ func NewSlice(n []float64) *Slice {
 /*
  * Usage: load topic models from file
  */
-func loadTopicModels() (*TopicModels, error) {
+func loadTopicModels(top_words_file string) (*TopicModels, error) {
 	fmt.Println("Load topic models from ", top_words_file)
 
 	// Read files
@@ -136,7 +145,8 @@ func loadTopicModels() (*TopicModels, error) {
 		return nil, err
 	}
 	reader := bufio.NewReader(fin)
-	var topics [num_topics]string
+	// var topics [num_topics]string
+	var topics []string
 	index := -1
 	count_topics := 0
 	for {
@@ -155,7 +165,12 @@ func loadTopicModels() (*TopicModels, error) {
 			continue
 		} else {
 			info := strings.Split(line, " ")
-			topics[index] += info[0] + " "
+			if index == len(topics) {
+				topics = append(topics, "")
+			} else {
+				topics[index] += info[0] + " "
+			}
+			// topics[index] += info[0] + " "
 			count_topics++
 		}
 	}
@@ -338,8 +353,8 @@ func generateTopicPostingList(index int) ([]int, error) {
 /*
  * Usage: find the position of the topic
  */
-func findTopicPosition(topics string) int {
-	topicModels, _ := loadTopicModels()
+func findTopicPosition(topics string, top_words_file string) int {
+	topicModels, _ := loadTopicModels(top_words_file)
 	position := 0
 	for _, b := range topicModels.Topics {
 		if b == topics {
@@ -354,20 +369,30 @@ func findTopicPosition(topics string) int {
  * Usage: home page handler(/)
  */
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	topicsModels, _ := loadTopicModels()
+	topicsModels, _ := loadTopicModels(top_words_file1)
 	topicsTrends, _ := generateTopicTrends()
+
+	topicsModelsToday, _ := loadTopicModels("./db/day15/model/top_words.txt")
+	eventRelationList, _ := app.NewEventDetect()
+
+	var todayTopicRelation TodayTopicRelation
+	todayTopicRelation.TopicsModelsToday = topicsModelsToday
+	todayTopicRelation.EventRelationList = eventRelationList
 
 	// Views loading
 	templates := template.Must(template.ParseGlob("./templates/*"))
 	var topicInfo struct {
-		TopicsModels *TopicModels
-		TopicsTrends *TopicTrendsOnTime
-		KLDivergence [num_topics][num_topics]string
-		EventName    [num_topics]string
+		TopicsModels       *TopicModels
+		TopicsTrends       *TopicTrendsOnTime
+		KLDivergence       [num_topics][num_topics]string
+		EventName          [num_topics]string
+		TodayTopicRealtion TodayTopicRelation
 	}
 	topicInfo.TopicsModels = topicsModels
 	topicInfo.TopicsTrends = topicsTrends
 	topicInfo.KLDivergence = KLDivergenceS
+
+	topicInfo.TodayTopicRealtion = todayTopicRelation
 	// Change it
 	topicInfo.EventName[0] = "Kiltwalk: I'll walk 156 miles inspired by the memories of Little Braveheart brother's smiles"
 	topicInfo.EventName[1] = "Karen Buckley: Fears grow for missing woman"
@@ -393,7 +418,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func topicHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	keywords := r.Form["keywords"][0]
-	position := findTopicPosition(keywords)
+	position := findTopicPosition(keywords, top_words_file1)
 
 	documentsPostingIndices, err := generateTopicPostingList(position)
 	if err != nil {
