@@ -22,10 +22,10 @@ def readFiles(document_path, mode):
 	for root, dirs, files in os.walk(document_path):
 		for name in files:
 			# This is for break point
-			if name == '553aceb1e4b08795cdc52b20':
-				flag = 1
-			if 0 == flag:
-				continue
+			# if name == '553aceb1e4b08795cdc52b20':
+			# 	flag = 1
+			# if 0 == flag:
+			# 	continue
 			# ===
 			file_name = root + "/" + name
 			if 'DS_Store' in file_name:
@@ -68,6 +68,7 @@ def curlDBPedia(file_path, file_name, text_content):
 	
 	payload = {"text": text_content, "confidence": "0.2", "support": "20"}
 	r = requests.get(DB_url, payload)
+	print file_path, file_name
 	write_response(file_path, file_name, r.text)
 
 '''
@@ -255,6 +256,7 @@ def main(argv):
 	if argv[1] == '1':
 		# document_path = "../data/research_data/s1_20_newsgroups/"
 		document_path = "../db/gms/s_month-4/"
+		print "Read from", document_path
 		readFiles(document_path, 1)
 	elif argv[1] == '2':
 		document_path = "../data/research_data/r_20_newsgroups/"
