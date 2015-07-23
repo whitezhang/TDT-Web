@@ -68,7 +68,6 @@ def curlDBPedia(file_path, file_name, text_content):
 	
 	payload = {"text": text_content, "confidence": "0.2", "support": "20"}
 	r = requests.get(DB_url, payload)
-	print file_path, file_name
 	write_response(file_path, file_name, r.text)
 
 '''
