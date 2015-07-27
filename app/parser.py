@@ -13,6 +13,7 @@ import sys
 import os
 import operator
 import math
+import urllib
 
 '''
 Common Section
@@ -22,7 +23,7 @@ def readFiles(document_path, mode):
 	for root, dirs, files in os.walk(document_path):
 		for name in files:
 			# This is for break point
-			# if name == '553aceb1e4b08795cdc52b20':
+			# if name == '82777':
 			# 	flag = 1
 			# if 0 == flag:
 			# 	continue
@@ -48,7 +49,8 @@ def write_response(file_path, file_name, text):
 	file_name = file_path+"/"+file_name
 	print "Writing...", file_name
 	output = open(file_name, "w")
-	output.write(text.encode("utf-8"))
+	# output.write(text.encode("utf-8"))
+	output.write(text)
 	output.close()
 
 def process_text(text_content):
@@ -67,8 +69,12 @@ def curlDBPedia(file_path, file_name, text_content):
 	text_content = process_text(text_content)
 	
 	payload = {"text": text_content, "confidence": "0.2", "support": "20"}
-	r = requests.get(DB_url, payload)
-	write_response(file_path, file_name, r.text)
+	params = urllib.urlencode(payload)
+	res = urllib.urlopen(DB_url, params).read()
+	write_response(file_path, file_name, res)
+
+	# r = requests.get(DB_url, payload)
+	# write_response(file_path, file_name, r.text)
 
 '''
 Section 2
@@ -254,8 +260,9 @@ def main(argv):
 		return
 	if argv[1] == '1':
 		# document_path = "../data/research_data/s1_20_newsgroups/"
-		document_path = "../db/gms/s_month-4/"
-		print "Read from", document_path
+		# document_path = "/Users/wyatt/Documents/Code/Gla/Final/DB/gms/s_month-4/"
+		document_path = "/Users/wyatt/Documents/Code/Gla/Final/Sources/plsa/data/s_exp20/"
+		# document_path = "../data/s_Test/"
 		readFiles(document_path, 1)
 	elif argv[1] == '2':
 		document_path = "../data/research_data/r_20_newsgroups/"
